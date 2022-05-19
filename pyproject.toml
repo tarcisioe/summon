@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "summon-tasks"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Tarcísio Eduardo Moreira Crocomo <tarcisioe@pm.me>"]
+license = "MIT"
+readme = "README.md"
 packages = [
     { include = "summon" },
 ]
