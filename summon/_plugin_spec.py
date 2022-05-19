@@ -1,7 +1,9 @@
 import pluggy
+from typing import Any, Callable, TypeVar, cast
 
+F = TypeVar("F", bound=Callable[..., Any])
 
-hookspec = pluggy.HookspecMarker("summon")
+hookspec = cast(Callable[[F], F], pluggy.HookspecMarker("summon"))
 
 
 @hookspec

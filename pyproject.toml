@@ -23,6 +23,13 @@ black = "^22.3.0"
 isort = "^5.10.1"
 flake8-bugbear = "^22.4.25"
 
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+module = "pluggy"
+ignore_missing_imports = true
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -1,17 +1,17 @@
 import shlex
 import subprocess
 from dataclasses import dataclass
-from typing import overload, Callable, List, Literal, Union
+from typing import overload, Callable, List, Literal, Optional, Union, ParamSpec
 
 import typer
 
 
 def run_command(
-    command: Union[str, List[str]], *args, **kwargs
-) -> subprocess.CompletedProcess:
+    command: Union[str, List[str]], stdout: Optional[int] = None,
+) -> subprocess.CompletedProcess[bytes]:
     """Wrapper for subprocess.run to support passing the command as a string."""
     split_command = shlex.split(command) if isinstance(command, str) else command
-    return subprocess.run(split_command, check=True, *args, **kwargs)
+    return subprocess.run(split_command, check=True, stdout=stdout)
 
 
 def command_output(command: Union[str, List[str]]) -> str:
@@ -35,15 +35,16 @@ class CommandSuccess:
     command_line: str
 
 
+P = ParamSpec('P')
 Result = Union[CommandError, CommandSuccess]
 
 
-def check_commands(f: Callable[..., List[Result]]) -> Callable[..., List[Result]]:
+def check_commands(f: Callable[P, List[Result]]) -> Callable[P, List[Result]]:
     """Make a function that returns Results terminate the app if any of them failed."""
     from functools import wraps
 
     @wraps(f)
-    def _inner(*args, **kwargs) -> List[Result]:
+    def _inner(*args: P.args, **kwargs: P.kwargs) -> List[Result]:
         results = f(*args, **kwargs)
 
         failed_results = [r for r in results if isinstance(r, CommandError)]

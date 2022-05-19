@@ -4,5 +4,5 @@ import typer
 APP = typer.Typer()
 
 
-def run():
+def run() -> None:
     APP()
