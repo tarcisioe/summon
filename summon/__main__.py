@@ -14,6 +14,12 @@ def get_plugin_manager() -> pluggy.PluginManager:
     return manager
 
 
+@_typer_app.APP.callback()
+def app_main() -> None:
+    """Summon is a task runner."""
+    pass
+
+
 def main() -> None:
     manager = get_plugin_manager()
     manager.hook.register_tasks()  # pylint: disable=no-member
