@@ -9,7 +9,7 @@ import typer
 
 def run_command(
     command: Union[str, List[str]], stdout: Optional[int] = None,
-) -> subprocess.CompletedProcess[bytes]:
+) -> 'subprocess.CompletedProcess[bytes]':
     """Wrapper for subprocess.run to support passing the command as a string."""
     split_command = shlex.split(command) if isinstance(command, str) else command
     return subprocess.run(split_command, check=True, stdout=stdout)
