@@ -1,7 +1,8 @@
 import shlex
 import subprocess
 from dataclasses import dataclass
-from typing import overload, Callable, List, Literal, Optional, Union, ParamSpec
+from typing import overload, Callable, List, Optional, Union, ParamSpec
+from typing_extensions import Literal
 
 import typer
 

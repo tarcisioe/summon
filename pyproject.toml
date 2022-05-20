@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "summon-tasks"
-version = "0.1.2"
+version = "0.1.3"
 description = ""
 authors = ["Tarcísio Eduardo Moreira Crocomo <tarcisioe@pm.me>"]
 license = "MIT"
@@ -13,6 +13,7 @@ packages = [
 python = "^3.7"
 typer = "^0.4.1"
 pluggy = "^1.0.0"
+typing-extensions = "^4.2.0"
 
 [tool.poetry.scripts]
 summon = "summon.__main__:main"
