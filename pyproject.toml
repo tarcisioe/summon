@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "summon-tasks"
-version = "0.1.3"
+version = "0.1.4"
 description = ""
 authors = ["Tarcísio Eduardo Moreira Crocomo <tarcisioe@pm.me>"]
 license = "MIT"
