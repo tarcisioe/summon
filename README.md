@@ -1,6 +1,9 @@
 Summon
 ======
 
+![](https://github.com/tarcisioe/summon/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/tarcisioe/summon/branch/master/graph/badge.svg)](https://codecov.io/gh/tarcisioe/summon)
+
 Summon is a task runner, inspired by [Invoke](https://www.pyinvoke.org/), but
 entirely type-hint compatible.
 
