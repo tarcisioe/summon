@@ -1,4 +1,5 @@
 """Tests for the `summon.tasks` module."""
+import sys
 from pathlib import Path
 
 from pytest import MonkeyPatch
@@ -10,11 +11,13 @@ def test_exit_task(datadir: Path, monkeypatch: MonkeyPatch) -> None:
 
     monkeypatch.chdir(datadir / "test_exit_task")
 
-    completed = run(["python", "-m", "summon", "test-task"], check=False)
+    completed = run([sys.executable, "-m", "summon", "test-task"], check=False)
 
     assert completed.returncode == 0
 
-    completed = run(["python", "-m", "summon", "test-task", "--fail"], check=False)
+    completed = run(
+        [sys.executable, "-m", "summon", "test-task", "--fail"], check=False
+    )
 
     assert completed.returncode == 1
 
@@ -25,11 +28,13 @@ def test_single_result_task(datadir: Path, monkeypatch: MonkeyPatch) -> None:
 
     monkeypatch.chdir(datadir / "test_single_result_task")
 
-    completed = run(["python", "-m", "summon", "test-task"], check=False)
+    completed = run([sys.executable, "-m", "summon", "test-task"], check=False)
 
     assert completed.returncode == 0
 
-    completed = run(["python", "-m", "summon", "test-task", "--fail"], check=False)
+    completed = run(
+        [sys.executable, "-m", "summon", "test-task", "--fail"], check=False
+    )
 
     assert completed.returncode == 3
 
@@ -40,10 +45,12 @@ def test_many_results_task(datadir: Path, monkeypatch: MonkeyPatch) -> None:
 
     monkeypatch.chdir(datadir / "test_many_results_task")
 
-    completed = run(["python", "-m", "summon", "test-task"], check=False)
+    completed = run([sys.executable, "-m", "summon", "test-task"], check=False)
 
     assert completed.returncode == 0
 
-    completed = run(["python", "-m", "summon", "test-task", "--fail-one"], check=False)
+    completed = run(
+        [sys.executable, "-m", "summon", "test-task", "--fail-one"], check=False
+    )
 
     assert completed.returncode == 1

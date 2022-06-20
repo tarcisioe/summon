@@ -8,7 +8,9 @@ import pytest
 @pytest.fixture
 def executable_base(datadir: Path) -> List[str]:
     """Base command line for running a test executable."""
-    return ["python", str(datadir / "executable.py")]
+    import sys
+
+    return [sys.executable, str(datadir / "executable.py")]
 
 
 def test_execute(executable_base: str) -> None:
