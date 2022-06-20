@@ -1,3 +1,4 @@
+"""General functions for manipulating projects."""
 from pathlib import Path
 from typing import Optional
 

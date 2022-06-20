@@ -1,10 +1,11 @@
+"""Command execution functionality."""
 import shlex
 import subprocess
 from dataclasses import dataclass
-from typing import Callable, List, NoReturn, Optional, Union, overload
+from typing import List, NoReturn, Optional, Union, overload
 
 import typer
-from typing_extensions import Literal, ParamSpec
+from typing_extensions import Literal, TypeGuard
 
 
 def _run(
@@ -31,7 +32,6 @@ class CommandSuccess:
     command_line: str
 
 
-_P = ParamSpec("_P")
 Result = Union[CommandError, CommandSuccess]
 
 
@@ -39,7 +39,7 @@ class _Exit(typer.Exit):
     """Signal that the program should exit."""
 
 
-def exit(code: int = 0) -> NoReturn:
+def exit(code: int = 0) -> NoReturn:  # pylint: disable=redefined-builtin
     """Exit with a given result code.
 
     Must be used inside a summon task.
@@ -47,29 +47,9 @@ def exit(code: int = 0) -> NoReturn:
     raise _Exit(code=code)
 
 
-def check_commands(
-    f: Callable[_P, List[Result]],
-) -> Callable[_P, List[Result]]:
-    """Make a function that returns Results terminate the app if any of them failed."""
-    from functools import wraps
-
-    @wraps(f)
-    def _inner(*args: _P.args, **kwargs: _P.kwargs) -> List[Result]:
-        results = f(*args, **kwargs)
-
-        failed_results = [r for r in results if isinstance(r, CommandError)]
-
-        if failed_results:
-            for failed in failed_results:
-                print(
-                    f'Command "{failed.command_line}" failed with error code '
-                    f"{failed.exit_code}."
-                )
-            exit(1)
-
-        return results
-
-    return _inner
+def all_success(results: List[Result]) -> TypeGuard[List[CommandSuccess]]:
+    """Assert that all Results are `CommandSuccess`es."""
+    return all(isinstance(r, CommandSuccess) for r in results)
 
 
 @overload
@@ -81,7 +61,8 @@ def execute(
     """Overload for when raise_error is True.
 
     In this case, we never return CommandError (we raise the subprocess
-    exception)."""
+    exception).
+    """
 
 
 @overload
@@ -92,7 +73,8 @@ def execute(
 ) -> Result:
     """Overload for when raise_error is True.
 
-    In this case, we never raise, and instead we return CommandError."""
+    In this case, we never raise, and instead we return CommandError.
+    """
 
 
 def execute(
@@ -106,10 +88,10 @@ def execute(
 
     try:
         _run(command)
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError as exc:
         if raise_error:
             raise
 
-        return CommandError(command_str, e.returncode)
+        return CommandError(command_str, exc.returncode)
 
     return CommandSuccess(command_str)

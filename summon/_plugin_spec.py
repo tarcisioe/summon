@@ -1,5 +1,7 @@
-import pluggy
+"""Specs for the `pluggy` plugins."""
 from typing import Any, Callable, TypeVar, cast
+
+import pluggy
 
 F = TypeVar("F", bound=Callable[..., Any])
 

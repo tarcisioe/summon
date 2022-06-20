@@ -1,1 +1,1 @@
-__version__ = '0.1.0'
+"""`summon` is a static-typed task runner with plugin support."""

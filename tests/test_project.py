@@ -1,9 +1,11 @@
+"""Tests for the `summon.project` module."""
 from pathlib import Path
 
 from pytest_mock import MockerFixture
 
 
 def test_reverse_directory_search(datadir: Path, mocker: MockerFixture) -> None:
+    """`reverse_directory_search` should find a file placed in a parent directory."""
     from summon.project import reverse_directory_search
 
     test_dir = datadir / "reverse_directory_search"

@@ -1,6 +1,5 @@
 import typer
 
-
 APP = typer.Typer()
 
 
@@ -10,5 +9,5 @@ def main(fail: bool = False) -> None:
         raise typer.Exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     APP()

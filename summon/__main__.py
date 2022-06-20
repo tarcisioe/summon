@@ -1,3 +1,4 @@
+"""Main module."""
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from .project import reverse_directory_search
 
 
 def get_plugin_manager() -> pluggy.PluginManager:
+    """Get the configured plugin manager for `summon`."""
     manager = pluggy.PluginManager("summon")
     manager.add_hookspecs(_plugin_spec)
     manager.load_setuptools_entrypoints("summon")
@@ -17,15 +19,18 @@ def get_plugin_manager() -> pluggy.PluginManager:
 @_typer_app.APP.callback()
 def app_main() -> None:
     """Summon is a task runner."""
-    pass
 
 
 def main() -> None:
+    """Main function.
+
+    Load plugins and run the main application.
+    """
     manager = get_plugin_manager()
     manager.hook.register_tasks()  # pylint: disable=no-member
-    tasks_file = reverse_directory_search('tasks.py', Path.cwd())
+    tasks_file = reverse_directory_search("tasks.py", Path.cwd())
     if tasks_file is not None:
-        tasks_spec = spec_from_file_location('_summon_user_tasks', tasks_file)
+        tasks_spec = spec_from_file_location("_summon_user_tasks", tasks_file)
         assert tasks_spec is not None
         module = module_from_spec(tasks_spec)
         assert tasks_spec.loader is not None
@@ -33,5 +38,5 @@ def main() -> None:
     _typer_app.APP()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
