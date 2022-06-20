@@ -1,24 +1,19 @@
 import shlex
 import subprocess
 from dataclasses import dataclass
-from typing import overload, Callable, List, Optional, Union
-from typing_extensions import Literal, ParamSpec
+from typing import Callable, List, NoReturn, Optional, Union, overload
 
 import typer
+from typing_extensions import Literal, ParamSpec
 
 
-def run_command(
-    command: Union[str, List[str]], stdout: Optional[int] = None,
-) -> 'subprocess.CompletedProcess[bytes]':
+def _run(
+    command: Union[str, List[str]],
+    stdout: Optional[int] = None,
+) -> "subprocess.CompletedProcess[bytes]":
     """Wrapper for subprocess.run to support passing the command as a string."""
     split_command = shlex.split(command) if isinstance(command, str) else command
     return subprocess.run(split_command, check=True, stdout=stdout)
-
-
-def command_output(command: Union[str, List[str]]) -> str:
-    """Run a command and get its stdout."""
-    process = run_command(command, stdout=subprocess.PIPE)
-    return process.stdout.decode('utf8')
 
 
 @dataclass
@@ -36,16 +31,30 @@ class CommandSuccess:
     command_line: str
 
 
-P = ParamSpec('P')
+_P = ParamSpec("_P")
 Result = Union[CommandError, CommandSuccess]
 
 
-def check_commands(f: Callable[P, List[Result]]) -> Callable[P, List[Result]]:
+class _Exit(typer.Exit):
+    """Signal that the program should exit."""
+
+
+def exit(code: int = 0) -> NoReturn:
+    """Exit with a given result code.
+
+    Must be used inside a summon task.
+    """
+    raise _Exit(code=code)
+
+
+def check_commands(
+    f: Callable[_P, List[Result]],
+) -> Callable[_P, List[Result]]:
     """Make a function that returns Results terminate the app if any of them failed."""
     from functools import wraps
 
     @wraps(f)
-    def _inner(*args: P.args, **kwargs: P.kwargs) -> List[Result]:
+    def _inner(*args: _P.args, **kwargs: _P.kwargs) -> List[Result]:
         results = f(*args, **kwargs)
 
         failed_results = [r for r in results if isinstance(r, CommandError)]
@@ -54,9 +63,9 @@ def check_commands(f: Callable[P, List[Result]]) -> Callable[P, List[Result]]:
             for failed in failed_results:
                 print(
                     f'Command "{failed.command_line}" failed with error code '
-                    f'{failed.exit_code}.'
+                    f"{failed.exit_code}."
                 )
-            raise typer.Exit(code=1)
+            exit(1)
 
         return results
 
@@ -65,7 +74,9 @@ def check_commands(f: Callable[P, List[Result]]) -> Callable[P, List[Result]]:
 
 @overload
 def execute(
-    command: Union[str, List[str]], *, raise_error: Literal[True] = True
+    command: Union[str, List[str]],
+    *,
+    raise_error: Literal[True],
 ) -> CommandSuccess:
     """Overload for when raise_error is True.
 
@@ -74,19 +85,27 @@ def execute(
 
 
 @overload
-def execute(command: Union[str, List[str]], *, raise_error: Literal[False]) -> Result:
+def execute(
+    command: Union[str, List[str]],
+    *,
+    raise_error: Literal[False] = False,
+) -> Result:
     """Overload for when raise_error is True.
 
     In this case, we never raise, and instead we return CommandError."""
 
 
-def execute(command: Union[str, List[str]], *, raise_error: bool = True) -> Result:
+def execute(
+    command: Union[str, List[str]],
+    *,
+    raise_error: bool = False,
+) -> Result:
     """Echo and run a command."""
-    command_str = command if isinstance(command, str) else ' '.join(command)
-    print(f'### Executing: {command_str}')
+    command_str = command if isinstance(command, str) else " ".join(command)
+    print(f"### Executing: {command_str}")
 
     try:
-        run_command(command)
+        _run(command)
     except subprocess.CalledProcessError as e:
         if raise_error:
             raise
